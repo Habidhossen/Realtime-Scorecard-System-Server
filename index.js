@@ -18,9 +18,11 @@ app.get("/", (req, res) => {
 
 // IMPORT ROUTES
 const eventRoute = require("./routes/event.route");
+const newsRoute = require("./routes/news.route");
 
 // ALL ROUTES HERE
 app.use("/api/v1", eventRoute);
+app.use("/api/v1", newsRoute);
 
 // LISTENING SERVER
 app.listen(port, () => {
