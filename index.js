@@ -7,12 +7,20 @@ const app = express();
 
 // MIDDLEWARE
 app.use(express.json());
-app.use(cors());
+app.use(
+  cors({ origin: "*", methods: ["GET", "POST", "PUT", "PATCH", "DELETE"] }) // for handling CORS policy error
+);
 
 // HOME ROUTE
 app.get("/", (req, res) => {
-  res.status(200).send("Realtime Scorecard server is running");
+  res.status(200).send("Realtime Scorecard server is running...");
 });
+
+// IMPORT ROUTES
+const eventRoute = require("./routes/event.route");
+
+// ALL ROUTES HERE
+app.use("/api/v1", eventRoute);
 
 // LISTENING SERVER
 app.listen(port, () => {
