@@ -19,10 +19,12 @@ app.get("/", (req, res) => {
 // IMPORT ROUTES
 const eventRoute = require("./routes/event.route");
 const newsRoute = require("./routes/news.route");
+const cricketMatchRoute = require("./routes/cricketMatch.route");
 
 // ALL ROUTES HERE
 app.use("/api/v1", eventRoute);
 app.use("/api/v1", newsRoute);
+app.use("/api/v1", cricketMatchRoute);
 
 // LISTENING SERVER
 app.listen(port, () => {
