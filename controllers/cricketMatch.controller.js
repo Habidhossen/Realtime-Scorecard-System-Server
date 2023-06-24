@@ -23,7 +23,9 @@ exports.createCricketMatch = async (req, res) => {
 // get all Event data from database
 exports.getAllCricketMatch = async (req, res) => {
   try {
-    const cricketMatchData = await cricketMatchModel.find();
+    const cricketMatchData = await cricketMatchModel
+      .find()
+      .sort({ createdAt: -1 });
     res.status(200).json({
       status: "success",
       data: cricketMatchData,
@@ -55,11 +57,31 @@ exports.getSingleCricketMatch = async (req, res) => {
   }
 }; */
 
-/* // delete Event from database by ID
-exports.deleteCricket = async (req, res) => {
+// get single Event data from database by ID
+exports.getLatestCricketMatch = async (req, res) => {
   try {
-    const eventId = req.params.id;
-    await eventModel.findByIdAndDelete(eventId);
+    const cricketMatchData = await cricketMatchModel
+      .find()
+      .sort({ createdAt: -1 })
+      .limit(1);
+    res.status(200).json({
+      status: "success",
+      data: cricketMatchData,
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: "fail",
+      message: "Can't get the data",
+      error: error.message,
+    });
+  }
+};
+
+// delete Event from database by ID
+exports.deleteCricketMatch = async (req, res) => {
+  try {
+    const matchId = req.params.id;
+    await cricketMatchModel.findByIdAndDelete(matchId);
     res.status(200).json({
       status: "success",
       message: "Data deleted successfully",
@@ -71,4 +93,4 @@ exports.deleteCricket = async (req, res) => {
       error: error.message,
     });
   }
-}; */
+};

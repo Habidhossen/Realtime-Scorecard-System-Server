@@ -41,6 +41,13 @@ const cricketMatchSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    status: {
+      type: String,
+      required: true,
+    },
+    matchWinner: {
+      type: String,
+    },
     team1: {
       name: {
         type: String,
