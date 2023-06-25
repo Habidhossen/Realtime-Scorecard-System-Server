@@ -13,6 +13,8 @@ const playerSchema = new mongoose.Schema({
   runsConceded: Number,
   economyRate: Number,
   strikeRate: Number,
+  wideBalls: Number,
+  noBalls: Number,
 });
 
 const cricketMatchSchema = new mongoose.Schema(

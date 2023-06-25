@@ -4,14 +4,15 @@ const {
   getAllCricketMatch,
   deleteCricketMatch,
   getLatestCricketMatch,
+  updateCricketScore,
 } = require("../controllers/cricketMatch.controller");
 
 const router = express.Router();
 
 router.post("/cricket-match", createCricketMatch);
 router.get("/cricket-match", getAllCricketMatch);
-router.get("/latest-cricket-match", getLatestCricketMatch);
-// router.get("/cricket-match/:id", getSingleNews);
 router.delete("/cricket-match/:id", deleteCricketMatch);
+router.get("/latest-cricket-match", getLatestCricketMatch);
+router.patch("/update-cricket-score/:id", updateCricketScore);
 
 module.exports = router;
