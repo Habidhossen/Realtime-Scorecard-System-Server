@@ -100,18 +100,6 @@ exports.deleteCricketMatch = async (req, res) => {
 exports.updateCricketScore = async (req, res) => {
   try {
     const matchId = req.params.id;
-
-    /*  
-        matchId: "64974c9623b560afdd41ff6e",
-        strikeBatsman: '64974c9623b560afdd41ff6f',
-        nonStrikeBatsman: '64974c9623b560afdd41ff6f',
-        strikeBowler: '64974c9623b560afdd41ff74',
-        ball: '1',
-        run: '0',
-        extraRunType: '',
-        outType: '' 
-    */
-
     const {
       strikeBatsman,
       nonStrikeBatsman,
@@ -129,7 +117,22 @@ exports.updateCricketScore = async (req, res) => {
       return res.status(404).json({ error: "Match not found" });
     }
 
-    // Update batsman data
+    // Update Team Data
+    const isBattingTeam = match.team1.players.some(
+      (player) => player._id.toString() === strikeBatsman
+    );
+    // Check condition which is Batting Team then update score (Run, Over, Wicket)
+    if (isBattingTeam) {
+      match.team1.runs += Number(run);
+      match.team1.wickets += Number(outType === "Not Out" ? 0 : 1);
+      match.team1.overs = `${Math.floor(totalBalls / 6)}.${totalBalls % 6}`;
+    } else {
+      match.team2.runs += Number(run);
+      match.team2.wickets += Number(outType === "Not Out" ? 0 : 1);
+      match.team2.overs = `${Math.floor(totalBalls / 6)}.${totalBalls % 6}`;
+    }
+
+    // Update Batsman data
     const batsmanToUpdate =
       match.team1.players.find(
         (player) => player._id.toString() === strikeBatsman
@@ -137,22 +140,19 @@ exports.updateCricketScore = async (req, res) => {
       match.team2.players.find(
         (player) => player._id.toString() === strikeBatsman
       );
+
     if (batsmanToUpdate) {
       batsmanToUpdate.ballsFaced += Number(ball);
       batsmanToUpdate.runsScored += Number(run);
+      batsmanToUpdate.fours += Number(run) === 4 ? 1 : 0;
+      batsmanToUpdate.sixes += Number(run) === 6 ? 1 : 0;
+      batsmanToUpdate.strikeRate = Number(
+        (batsmanToUpdate?.runsScored / batsmanToUpdate?.ballsFaced) * 100
+      ).toFixed(2);
       batsmanToUpdate.dismissals = outType;
     }
 
-    const nonStrikeBatsmanToUpdate = match.team1.players.find(
-      (player) => player._id.toString() === nonStrikeBatsman
-    );
-    if (nonStrikeBatsmanToUpdate) {
-      // nonStrikeBatsmanToUpdate.ballsFaced = ball;
-      // nonStrikeBatsmanToUpdate.runsScored = run;
-      // nonStrikeBatsmanToUpdate.dismissals = outType;
-    }
-
-    // Update bowler data
+    // Update Bowler data
     const bowlerToUpdate =
       match.team1.players.find(
         (player) => player._id.toString() === strikeBowler
@@ -161,12 +161,21 @@ exports.updateCricketScore = async (req, res) => {
         (player) => player._id.toString() === strikeBowler
       );
     if (bowlerToUpdate) {
-      bowlerToUpdate.runsConceded = run;
+      bowlerToUpdate.runsConceded += Number(run);
+      bowlerToUpdate.wicketsTaken += Number(outType === "Not Out" ? 0 : 1);
+      bowlerToUpdate.wideBalls += Number(extraRunType === "Wide" ? 1 : 0);
+      bowlerToUpdate.noBalls += Number(outType === "No Ball" ? 1 : 0);
     }
+
+    /* const nonStrikeBatsmanToUpdate = match.team1.players.find(
+      (player) => player._id.toString() === nonStrikeBatsman
+    );
+    if (nonStrikeBatsmanToUpdate) {
+    } */
 
     // Save the updated match data
     await match.save();
-
+    // Send response
     res.status(200).json({
       status: "success",
       message: "Match data updated successfully",
