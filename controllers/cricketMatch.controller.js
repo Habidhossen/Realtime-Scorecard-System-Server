@@ -117,7 +117,7 @@ exports.updateCricketScore = async (req, res) => {
       return res.status(404).json({ error: "Match not found" });
     }
 
-    // Update Team Data
+    /* // Update Team Data
     const isBattingTeam = match.team1.players.some(
       (player) => player._id.toString() === strikeBatsman
     );
@@ -146,7 +146,25 @@ exports.updateCricketScore = async (req, res) => {
       match.team2.overs = `${Math.floor(match.team2.balls / 6)}.${
         match.team2.balls % 6
       }`;
-    }
+    } */
+
+    // Update Team Data
+    const teamToUpdate = match.team1.players.some(
+      (player) => player._id.toString() === strikeBatsman
+    )
+      ? match.team1
+      : match.team2;
+
+    teamToUpdate.runs +=
+      extraRunType === "Wide" || extraRunType === "No Ball"
+        ? 1 + Number(run)
+        : Number(run);
+    teamToUpdate.balls +=
+      extraRunType === "Wide" || extraRunType === "No Ball" ? 0 : Number(ball);
+    teamToUpdate.wickets += outType !== "Not Out" ? 1 : 0;
+    teamToUpdate.overs = `${Math.floor(teamToUpdate.balls / 6)}.${
+      teamToUpdate.balls % 6
+    }`;
 
     // Update Batsman data
     const batsmanToUpdate =
