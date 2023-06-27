@@ -9,7 +9,7 @@ const playerSchema = new mongoose.Schema({
   sixes: Number,
   dismissals: String,
   wicketsTaken: Number,
-  oversBowled: Number,
+  ballsBowled: Number,
   runsConceded: Number,
   economyRate: Number,
   strikeRate: Number,
@@ -69,6 +69,7 @@ const cricketMatchSchema = new mongoose.Schema(
       overs: Number,
       wickets: Number,
       runs: Number,
+      balls: Number,
     },
     team2: {
       name: {
@@ -89,6 +90,7 @@ const cricketMatchSchema = new mongoose.Schema(
       overs: Number,
       wickets: Number,
       runs: Number,
+      balls: Number,
     },
   },
   {

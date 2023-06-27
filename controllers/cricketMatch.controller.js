@@ -123,13 +123,29 @@ exports.updateCricketScore = async (req, res) => {
     );
     // Check condition which is Batting Team then update score (Run, Over, Wicket)
     if (isBattingTeam) {
-      match.team1.runs += Number(run);
+      match.team1.runs +=
+        extraRunType === "Wide" || extraRunType === "No Ball"
+          ? 1 + Number(run)
+          : Number(run);
+      match.team1.balls += Number(
+        extraRunType === "Wide" || extraRunType === "No Ball" ? 0 : ball
+      );
       match.team1.wickets += Number(outType === "Not Out" ? 0 : 1);
-      match.team1.overs = `${Math.floor(totalBalls / 6)}.${totalBalls % 6}`;
+      match.team1.overs = `${Math.floor(match.team1.balls / 6)}.${
+        match.team1.balls % 6
+      }`;
     } else {
-      match.team2.runs += Number(run);
+      match.team2.runs +=
+        extraRunType === "Wide" || extraRunType === "No Ball"
+          ? 1 + Number(run)
+          : Number(run);
+      match.team2.balls += Number(
+        extraRunType === "Wide" || extraRunType === "No Ball" ? 0 : ball
+      );
       match.team2.wickets += Number(outType === "Not Out" ? 0 : 1);
-      match.team2.overs = `${Math.floor(totalBalls / 6)}.${totalBalls % 6}`;
+      match.team2.overs = `${Math.floor(match.team2.balls / 6)}.${
+        match.team2.balls % 6
+      }`;
     }
 
     // Update Batsman data
@@ -142,7 +158,9 @@ exports.updateCricketScore = async (req, res) => {
       );
 
     if (batsmanToUpdate) {
-      batsmanToUpdate.ballsFaced += Number(ball);
+      batsmanToUpdate.ballsFaced += Number(
+        extraRunType === "Wide" || extraRunType === "No Ball" ? 0 : ball
+      );
       batsmanToUpdate.runsScored += Number(run);
       batsmanToUpdate.fours += Number(run) === 4 ? 1 : 0;
       batsmanToUpdate.sixes += Number(run) === 6 ? 1 : 0;
@@ -160,18 +178,19 @@ exports.updateCricketScore = async (req, res) => {
       match.team2.players.find(
         (player) => player._id.toString() === strikeBowler
       );
+
     if (bowlerToUpdate) {
       bowlerToUpdate.runsConceded += Number(run);
+      bowlerToUpdate.ballsBowled += Number(
+        extraRunType === "Wide" || extraRunType === "No Ball" ? 0 : ball
+      );
       bowlerToUpdate.wicketsTaken += Number(outType === "Not Out" ? 0 : 1);
       bowlerToUpdate.wideBalls += Number(extraRunType === "Wide" ? 1 : 0);
       bowlerToUpdate.noBalls += Number(outType === "No Ball" ? 1 : 0);
+      bowlerToUpdate.economyRate = Number(
+        bowlerToUpdate?.runsConceded / (bowlerToUpdate?.ballsBowled / 6)
+      ).toFixed(2);
     }
-
-    /* const nonStrikeBatsmanToUpdate = match.team1.players.find(
-      (player) => player._id.toString() === nonStrikeBatsman
-    );
-    if (nonStrikeBatsmanToUpdate) {
-    } */
 
     // Save the updated match data
     await match.save();
