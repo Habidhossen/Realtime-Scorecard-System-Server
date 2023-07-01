@@ -1,7 +1,7 @@
 const { default: mongoose } = require("mongoose");
 const cricketMatchModel = require("../models/cricketMatch.model");
 
-// create a new Event in database
+// create a new Match in database
 exports.createCricketMatch = async (req, res) => {
   try {
     const data = req.body;
@@ -21,7 +21,7 @@ exports.createCricketMatch = async (req, res) => {
   }
 };
 
-// get all Event data from database
+// get all Match data from database
 exports.getAllCricketMatch = async (req, res) => {
   try {
     const cricketMatchData = await cricketMatchModel
@@ -78,7 +78,7 @@ exports.getLatestCricketMatch = async (req, res) => {
   }
 };
 
-// delete Event from database by ID
+// delete Match from database by ID
 exports.deleteCricketMatch = async (req, res) => {
   try {
     const matchId = req.params.id;
@@ -116,37 +116,6 @@ exports.updateCricketScore = async (req, res) => {
     if (!match) {
       return res.status(404).json({ error: "Match not found" });
     }
-
-    /* // Update Team Data
-    const isBattingTeam = match.team1.players.some(
-      (player) => player._id.toString() === strikeBatsman
-    );
-    // Check condition which is Batting Team then update score (Run, Over, Wicket)
-    if (isBattingTeam) {
-      match.team1.runs +=
-        extraRunType === "Wide" || extraRunType === "No Ball"
-          ? 1 + Number(run)
-          : Number(run);
-      match.team1.balls += Number(
-        extraRunType === "Wide" || extraRunType === "No Ball" ? 0 : ball
-      );
-      match.team1.wickets += Number(outType === "Not Out" ? 0 : 1);
-      match.team1.overs = `${Math.floor(match.team1.balls / 6)}.${
-        match.team1.balls % 6
-      }`;
-    } else {
-      match.team2.runs +=
-        extraRunType === "Wide" || extraRunType === "No Ball"
-          ? 1 + Number(run)
-          : Number(run);
-      match.team2.balls += Number(
-        extraRunType === "Wide" || extraRunType === "No Ball" ? 0 : ball
-      );
-      match.team2.wickets += Number(outType === "Not Out" ? 0 : 1);
-      match.team2.overs = `${Math.floor(match.team2.balls / 6)}.${
-        match.team2.balls % 6
-      }`;
-    } */
 
     // Update Team Data
     const teamToUpdate = match.team1.players.some(
@@ -209,6 +178,39 @@ exports.updateCricketScore = async (req, res) => {
         bowlerToUpdate?.runsConceded / (bowlerToUpdate?.ballsBowled / 6)
       ).toFixed(2);
     }
+
+    // Save the updated match data
+    await match.save();
+    // Send response
+    res.status(200).json({
+      status: "success",
+      message: "Match data updated successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: "fail",
+      message: "Can't get the data",
+      error: error.message,
+    });
+  }
+};
+
+// FINISH CRICKET MATCH & UPDATE STATUS
+exports.matchFinish = async (req, res) => {
+  try {
+    const matchId = req.params.id;
+    const { status, matchWinner } = req.body;
+
+    // Find the match by ID
+    const match = await cricketMatchModel.findById(matchId);
+
+    if (!match) {
+      return res.status(404).json({ error: "Match not found" });
+    }
+
+    // update data
+    match.status = status;
+    match.matchWinner = matchWinner;
 
     // Save the updated match data
     await match.save();
