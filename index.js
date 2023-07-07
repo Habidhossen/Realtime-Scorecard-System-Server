@@ -20,11 +20,13 @@ app.get("/", (req, res) => {
 const eventRoute = require("./routes/event.route");
 const newsRoute = require("./routes/news.route");
 const cricketMatchRoute = require("./routes/cricketMatch.route");
+const adminRoute = require("./routes/admin.route");
 
 // ALL ROUTES HERE
 app.use("/api/v1", eventRoute);
 app.use("/api/v1", newsRoute);
 app.use("/api/v1", cricketMatchRoute);
+app.use("/api/v1", adminRoute);
 
 // LISTENING SERVER
 app.listen(port, () => {

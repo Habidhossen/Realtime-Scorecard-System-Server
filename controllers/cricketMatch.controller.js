@@ -40,24 +40,6 @@ exports.getAllCricketMatch = async (req, res) => {
   }
 };
 
-/* // get single Event data from database by ID
-exports.getSingleCricketMatch = async (req, res) => {
-  try {
-    const eventId = req.params.id;
-    const eventData = await eventModel.findById(eventId);
-    res.status(200).json({
-      status: "success",
-      data: eventData,
-    });
-  } catch (error) {
-    res.status(500).json({
-      status: "fail",
-      message: "Can't get the data",
-      error: error.message,
-    });
-  }
-}; */
-
 // get Latest Cricket Match data from database
 exports.getLatestCricketMatch = async (req, res) => {
   try {
